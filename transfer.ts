@@ -17,9 +17,7 @@ const to = new PublicKey("CcmNmVgskZJeAHnSQu1bGV3tYQesPMk8HwH4SH3Xm6D");
 
 (async () => {
   try {
-    // Get balance of dev wallet
     const balance = await connection.getBalance(from.publicKey);
-    // Create a test transaction to calculate fees
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: from.publicKey,
@@ -33,7 +31,6 @@ const to = new PublicKey("CcmNmVgskZJeAHnSQu1bGV3tYQesPMk8HwH4SH3Xm6D");
 
     transaction.feePayer = from.publicKey;
 
-    // Calculate exact fee rate to transfer entire SOL amount out of account minus fees
     const fee =
       (
         await connection.getFeeForMessage(
@@ -42,10 +39,8 @@ const to = new PublicKey("CcmNmVgskZJeAHnSQu1bGV3tYQesPMk8HwH4SH3Xm6D");
         )
       ).value || 0;
 
-    // Remove our transfer instruction to replace it
     transaction.instructions.pop();
 
-    // Now add the instruction back with correct amount of lamports
     transaction.add(
       SystemProgram.transfer({
         fromPubkey: from.publicKey,
@@ -62,15 +57,3 @@ const to = new PublicKey("CcmNmVgskZJeAHnSQu1bGV3tYQesPMk8HwH4SH3Xm6D");
     console.error(`Oops, something went wrong: ${e}`);
   }
 })();
-
-//     // Sign transaction, broadcast, and confirm
-//     const signature = await sendAndConfirmTransaction(connection, transaction, [
-//       from,
-//     ]);
-//     console.log(
-//       `Success! Check out your TX here:https://explorer.solana.com/tx/${signature}?cluster=devnet`
-//     );
-//   } catch (e) {
-//     console.error(`Oops, something went wrong: ${e}`);
-//   }
-// })();
